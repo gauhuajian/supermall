@@ -14,10 +14,6 @@
 <script></script>
 <style lang="less" scoped>
 .nav {
-	position: relative;
-	top: 0;
-	right: 0;
-	left: 0;
 	display: flex;
 	height: 1.17rem;
 	line-height: 1.17rem;

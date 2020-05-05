@@ -18,9 +18,6 @@ export default {
 			},
 		},
 	},
-	created() {
-		console.log(this.recommend);
-	},
 };
 </script>
 <style lang="less" scoped>
