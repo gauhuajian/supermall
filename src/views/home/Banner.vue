@@ -3,7 +3,7 @@
 		<swiper ref="mySwiper" :options="swiperOptions">
 			<swiper-slide v-for="item in banner" :key="item.id">
 				<a :href="item.link">
-					<img :src="item.image" alt="" />
+					<img :src="item.image" alt="" @load="bannerImgload" />
 				</a>
 			</swiper-slide>
 		</swiper>
@@ -30,7 +30,16 @@ export default {
 				loopAdditionalSlides: 3,
 				autoplay: true,
 			},
+			isLoad: false,
 		};
+	},
+	methods: {
+		bannerImgload() {
+			if (!this.isLoad) {
+				this.$emit('bannerImageload');
+				this.isLoad = true;
+			}
+		},
 	},
 };
 </script>
