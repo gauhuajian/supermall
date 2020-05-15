@@ -8,7 +8,7 @@
 			<i slot="inco" class="iconfont">&#xe601;</i>
 			<div slot="title">分类</div>
 		</tab-bar-item>
-		<tab-bar-item path="/shopping">
+		<tab-bar-item path="/cart">
 			<i slot="inco" class="iconfont">&#xe600;</i>
 			<div slot="title">购物车</div>
 		</tab-bar-item>

@@ -29,7 +29,7 @@ export default {
 	padding: 0.5rem 0;
 	border-bottom: 0.2rem solid #eee;
 	.recommend-item {
-		width: 2.50133rem;
+		width: 2.5rem;
 		a {
 			text-decoration: none;
 			display: block;

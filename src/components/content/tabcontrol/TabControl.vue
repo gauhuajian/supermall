@@ -30,6 +30,7 @@ export default {
 		itemClick(index) {
 			this.initIndex = index;
 			this.$emit('itemClick', index);
+			this.$bus.$emit('itemClick', index);
 		},
 	},
 };

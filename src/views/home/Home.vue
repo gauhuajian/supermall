@@ -1,38 +1,38 @@
 <template>
-	<keep-alive>
-		<div id="home">
-			<nav-bar class="title">
-				<div slot="nav-center">购物街</div>
-			</nav-bar>
-			<tab-control
-				ref="tabControl"
-				class="tabcontrol"
-				v-show="isShowControl"
-				:title="['流行', '新款', '精选']"
-				@itemClick="itemClick"
-			/>
-			<Scroll class="con" ref="Scroll" :probeType="3" @scroll="scroll" :pullUpLoad="true" @pullingUp="loadMore">
-				<Banner :banner="banner" @bannerImageload="bannerImageload" />
-				<Recommend :recommend="recommend" />
-				<FeatuerView />
-				<tab-control ref="tabControl" :title="['流行', '新款', '精选']" @itemClick="itemClick" />
-				<Goods :goods="showGoods" />
-			</Scroll>
-			<BackTop @click.native="backClick" v-show="isShowBackTop" />
-		</div>
-	</keep-alive>
+	<div id="home">
+		<nav-bar class="title">
+			<div slot="nav-center">购物街</div>
+		</nav-bar>
+		<tab-control
+			ref="tabControls"
+			class="tabcontrol"
+			v-show="isShowControl"
+			:title="['流行', '新款', '精选']"
+			@itemClick="itemClick"
+		/>
+		<Scroll class="con" ref="Scroll" :probeType="3" @scroll="scroll" :pullUpLoad="true" @pullingUp="loadMore">
+			<Banner :banner="banner" @bannerImageload="bannerImageload" />
+			<Recommend :recommend="recommend" />
+			<FeatuerView />
+			<tab-control ref="tabControl" :title="['流行', '新款', '精选']" @itemClick="itemClick" />
+			<Goods :goods="showGoods" />
+		</Scroll>
+		<!-- <BackTop @click.native="backClick" v-show="isShowBackTop" /> -->
+		<backTop @click.native="backClick" v-show="isShowBackTop" />
+	</div>
 </template>
 <script>
-import Banner from './Banner';
-import Recommend from './Recommend';
-import FeatuerView from './FeatuerView';
+import Banner from './pages/Banner';
+import Recommend from './pages/Recommend';
+import FeatuerView from './pages/FeatuerView';
 
 //公共组件
 import navBar from '@/components/content/navbar/Navbar';
 import TabControl from '@/components/content/tabcontrol/TabControl';
 import Goods from '@/components/content/goods/Goods';
 import Scroll from '@/components/content/scroll/Scroll';
-import BackTop from '@/components/content/backtop/BackTop';
+//混入
+import { itemListenerMixin, BackTop } from '@/common/mix';
 
 export default {
 	components: {
@@ -44,8 +44,8 @@ export default {
 		TabControl,
 		Goods,
 		Scroll,
-		BackTop,
 	},
+	mixins: [itemListenerMixin, BackTop],
 	data() {
 		return {
 			banner: [],
@@ -65,9 +65,9 @@ export default {
 				},
 			},
 			currentType: 'pop',
-			isShowBackTop: false,
-			tabControlTop: 0,
 			isShowControl: false,
+			tabControlTop: 0,
+			scrollY: 0,
 		};
 	},
 	created() {
@@ -76,29 +76,21 @@ export default {
 		this.getHomeGoods('new');
 		this.getHomeGoods('sell');
 	},
-	mounted() {
-		//重新计算滑动高度 调用防抖
-		const refresh = this.debounce(this.$refs.Scroll.refresh, 200);
-		this.$bus.$on('imageload', () => {
-			refresh();
-		});
+	activated() {
+		this.$refs.Scroll.scrollto(0, this.scrollY, 0);
+		this.$refs.Scroll.refresh();
 	},
+	deactivated() {
+		this.scrollY = this.$refs.Scroll.scroll.y;
+		this.$bus.$off('imageload', this.itemListener);
+	},
+
 	computed: {
 		showGoods() {
 			return this.goods[this.currentType].list;
 		},
 	},
 	methods: {
-		//防抖
-		debounce(func, delay) {
-			let tiems = null;
-			return function() {
-				if (tiems) clearTimeout(tiems);
-				tiems = setTimeout(() => {
-					func.call(this);
-				}, delay);
-			};
-		},
 		//事件监听相关
 		itemClick(index) {
 			switch (index) {
@@ -114,17 +106,16 @@ export default {
 				default:
 					break;
 			}
-		},
-		//返回顶部
-		backClick() {
-			this.$refs.Scroll.scrollto(0, 0);
+			this.$refs.tabControl.initIndex = index;
+			this.$refs.tabControls.initIndex = index;
+			this.$refs.Scroll.scrollto(0, -this.$refs.tabControl.$el.offsetTop, 200);
 		},
 		//监听滚动位置
 		scroll(position) {
-			this.isShowBackTop = -position.y > 700;
+			this.backTop(position); //混入返回顶部
 			this.isShowControl = -position.y > this.tabControlTop;
 		},
-		// 下拉加载
+		//上拉加载
 		loadMore() {
 			this.getHomeGoods(this.currentType);
 			this.$refs.Scroll.finishPullUp(); //上拉加载需要调用此方法告诉 better-scroll 数据已加载
@@ -137,6 +128,8 @@ export default {
 		async getHome() {
 			let res = await this.axios.get('/home/multidata');
 			this.banner = res.data.data.banner.list;
+			console.log(res.data.data);
+
 			this.recommend = res.data.data.recommend.list;
 		},
 		async getHomeGoods(type) {

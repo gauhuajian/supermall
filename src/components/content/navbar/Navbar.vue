@@ -19,6 +19,9 @@
 	line-height: 1.17rem;
 	.nav-left {
 		width: 1.6rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 	.nav-center {
 		flex: 1;

@@ -6,7 +6,8 @@
 <style lang="less" scoped>
 .FeatuerView {
 	img {
-		width: 10rem;
+		display: block;
+		width: 10.09rem;
 	}
 }
 </style>

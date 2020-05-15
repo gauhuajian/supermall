@@ -18,7 +18,7 @@ export default {
 		pullUpLoad: {
 			type: Boolean,
 			default() {
-				return false;
+				return true;
 			},
 		},
 	},
@@ -41,7 +41,7 @@ export default {
 			 */
 			this.scroll && this.scroll.refresh();
 		},
-		//下拉加载完毕发送信号
+		//上拉加载完毕发送信号
 		finishPullUp() {
 			this.scroll && this.scroll.finishPullUp();
 		},
@@ -53,14 +53,13 @@ export default {
 			probeType: this.probeType, //派发scroll事件
 			pullUpLoad: this.pullUpLoad,
 		});
-
-		//监听滚动
-		this.scroll.on('scroll', (position) => {
-			this.$emit('scroll', position);
-		});
 		//上拉加载
 		this.scroll.on('pullingUp', () => {
 			this.$emit('pullingUp');
+		});
+		//监听滚动
+		this.scroll.on('scroll', (position) => {
+			this.$emit('scroll', position);
 		});
 	},
 };

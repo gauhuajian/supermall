@@ -1,6 +1,8 @@
 <template>
 	<div id="app">
-		<router-view></router-view>
+		<keep-alive exclude="Detalis">
+			<router-view></router-view>
+		</keep-alive>
 		<tab-bar />
 	</div>
 </template>
